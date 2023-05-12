@@ -3,70 +3,103 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
-{
-    private Vector2 direction = Vector2.right;
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            direction = Vector2.up;
-        }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            direction = Vector2.left;
-        }
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            direction = Vector2.down;
-        }
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            direction = Vector2.right;
-        }
+{ 
+    int direction;
+    public float moveTime = 1;
+    float lastMove = 0;
 
-    }
-    private void FixedUpdate()
-    {
-        this.transform.position = new Vector3(Mathf.Round(this.transform.position.x) + direction.x, Mathf.Round(this.transform.position.y) + direction.y, 0.0f);
-    }
+    public SnakeTail tail;
 
-    /*
-    public float speed;
+    public SnakeTail tailPrefab;
 
-    private Vector3 direction = Vector3.right;
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            direction = Vector3.down;
-        }
-        else if (Input.GetKeyDown(KeyCode.A))
-        {
-            direction = Vector3.left;
-        }
-        else if (Input.GetKeyDown(KeyCode.W))
-        {
-            direction = Vector3.up;
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            direction = Vector3.right;
-        }
-
-        transform.position += direction * speed * Time.deltaTime;
-    }
-    
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.transform.gameObject.name.Contains("Wall"))
+        if (collision.gameObject.transform.name.Contains("Wall"))
         {
             Destroy(gameObject);
         }
-        if (collision.transform.gameObject.name.Contains("Food"))
-        {
+    }
+    void Start()
+    {
 
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            SnakeTail newTail = Instantiate(tailPrefab);
+
+            tail.AddTail(newTail);
+        }
+
+        float v = Input.GetAxisRaw("Vertical");
+        float h = Input.GetAxisRaw("Horizontal");
+
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            direction = 0;
+        }
+        else if (Input.GetKeyDown(KeyCode.A))
+        {
+            direction = 1;
+        }
+        else if (Input.GetKeyDown(KeyCode.D))
+        {
+            direction = 2;
+        }
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            direction = 3;
+        }
+
+        if (lastMove + moveTime <= Time.time)
+        {
+            Vector3 move = Vector3.zero;
+            lastMove = Time.time;
+
+            if (direction == 0)
+            {
+                move = Vector3.right;
+            }
+            else if (direction == 1)
+            {
+                move = Vector3.down;
+            }
+            else if (direction == 2)
+            {
+                move = Vector3.up;
+            }
+            else if (direction == 3)
+            {
+                move = Vector3.left;
+            }
+
+            if (tail != null)
+            {
+                tail.Move(transform.position);
+            }
+            transform.Translate(move);
         }
     }
-    */
+
+    public void RotatePlayer()
+    {
+        if (direction == 0)
+        {
+            transform.localRotation = Quaternion.Euler(0, 0, -90);
+        }
+        else if (direction == 1)
+        {
+            transform.localRotation = Quaternion.Euler(0, 0, 90);
+        }
+        else if (direction == 2)
+        {
+            transform.localRotation = Quaternion.Euler(0, 0, 0);
+        }
+        else if (direction == 3)
+        {
+            transform.localRotation = Quaternion.Euler(0, 0, 180);
+        }
+    }
 }
